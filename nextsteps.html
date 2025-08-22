@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Next Steps</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: calc(100vh - 40px);
+    }
+
+    .left-panel {
+      padding: 40px;
+      background: #f8f9fa;
+      border-right: 1px solid #eee;
+    }
+
+    .steps-title {
+      font-size: 1.8rem;
+      margin-bottom: 30px;
+      color: #333;
+    }
+
+    .step-item {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border-left: 4px solid #667eea;
+    }
+
+    .step-number {
+      font-weight: bold;
+      color: #667eea;
+      margin-bottom: 5px;
+    }
+
+    .step-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .step-description {
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .right-panel {
+      padding: 40px;
+      overflow-y: auto;
+    }
+
+    .results-title {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+	.save-btn {
+		background: #151515;
+		color: #fff;
+		border: none;
+		padding: 10px 20px;
+		border-radius: 6px;
+		font-size: 1rem;
+		cursor: pointer;
+		transition: background 0.2s ease;
+	  }
+	.save-btn:hover {
+		background: #222;
+	  }
+	  
+    .code-container {
+      background: #1a1a1a;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .code-title {
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .code-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .copy-btn, .download-btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .copy-btn:hover, .download-btn:hover {
+      background: #5a6fd8;
+    }
+
+    .download-btn {
+      background: #28a745;
+    }
+
+    .download-btn:hover {
+      background: #218838;
+    }
+
+    .code-content {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 15px;
+      border-radius: 4px;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Left side -->
+    <div class="left-panel">
+      <h2 class="steps-title">Your Next Steps</h2>
+
+      <div class="step-item">
+        <div class="step-number">Step 1</div>
+        <div class="step-title">Placeholder Title</div>
+        <div class="step-description">Lorem ipsum placeholder description text.</div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">Step 2</div>
+        <div class="step-title">Placeholder Title</div>
+        <div class="step-description">Lorem ipsum placeholder description text.</div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">Step 3</div>
+        <div class="step-title">Placeholder Title</div>
+        <div class="step-description">Lorem ipsum placeholder description text.</div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">Step 4</div>
+        <div class="step-title">Placeholder Title</div>
+        <div class="step-description">Lorem ipsum placeholder description text.</div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">Step 5</div>
+        <div class="step-title">Placeholder Title</div>
+        <div class="step-description">Lorem ipsum placeholder description text.</div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-number">Step 6</div>
+        <div class="step-title">Placeholder Title</div>
+        <div class="step-description">Lorem ipsum placeholder description text.</div>
+      </div>
+
+      <!-- Hidden extra info toggles -->
+      <div style="margin-top:30px; font-size:0.9rem; color:#555;">
+        <p style="cursor:pointer; color:#667eea;" onclick="toggleSection('promptSection')">📌 View Prompt</p>
+        <div id="promptSection" style="display:none; background:#fff; border:1px solid #ddd; padding:10px; border-radius:6px; margin-bottom:10px;"></div>
+
+        <p style="cursor:pointer; color:#667eea;" onclick="toggleSection('chatSection')">💬 View Previous Chat</p>
+        <div id="chatSection" style="display:none; background:#fff; border:1px solid #ddd; padding:10px; border-radius:6px; max-height:200px; overflow-y:auto;"></div>
+      </div>
+    </div>
+
+    <!-- Right side -->
+    <div class="right-panel">
+	<div style="margin-bottom:20px;">
+	  <button class="save-btn" onclick="saveToAccount()">💾 Save to Your Account</button>
+	  <p style="font-size:0.85rem; color:#333; margin-top:6px;">
+		Save the code & chat, so you can access it again later.
+	  </p>
+	</div>
+      <h2 class="results-title">Generated HTML Code</h2>
+      <div class="code-container">
+        <div class="code-header">
+          <span class="code-title">HTML Output</span>
+          <div class="code-actions">
+            <button class="copy-btn" onclick="copyCode()">Copy Code</button>
+            <button class="download-btn" onclick="downloadCode()">Download HTML</button>
+          </div>
+        </div>
+        <div class="code-content" id="codeContent">
+          <!-- This will be filled with the same code as from index.html -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Toggle hidden sections
+    function toggleSection(id) {
+      const el = document.getElementById(id);
+      el.style.display = el.style.display === "none" ? "block" : "none";
+    }
+
+    // Copy code button
+    function copyCode() {
+      const code = document.getElementById("codeContent").textContent;
+      navigator.clipboard.writeText(code);
+      alert("Code copied to clipboard!");
+    }
+
+    // Download code button
+    function downloadCode() {
+      const code = document.getElementById("codeContent").textContent;
+      const blob = new Blob([code], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "experimental-realism-webpage.html";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+	
+	function saveToAccount() {
+	  const code = document.getElementById("codeContent").textContent;
+	  const prompt = localStorage.getItem("generatedPrompt") || "";
+	  const chat = localStorage.getItem("chatMessages") || "[]";
+
+	  // For now, just log what would be saved
+	  console.log("Saving to account:", { code, prompt, chat });
+
+	  // Later: make an API call to your backend
+	  fetch("/api/save", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ code, prompt, chat })
+	  })
+	  .then(res => res.json())
+	  .then(data => {
+		alert("Saved to your account!");
+	  })
+	  .catch(err => {
+		console.error(err);
+		alert("Error saving. Please log in first.");
+	  });
+	}
+
+    // ✅ Load the code, prompt, and chat history from localStorage
+    document.addEventListener("DOMContentLoaded", () => {
+      const savedCode = localStorage.getItem("generatedCode");
+      if (savedCode) {
+        document.getElementById("codeContent").textContent = savedCode;
+      }
+
+      const savedPrompt = localStorage.getItem("generatedPrompt");
+      if (savedPrompt) {
+        document.getElementById("promptSection").textContent = savedPrompt;
+      }
+
+      const savedChat = localStorage.getItem("chatMessages");
+      if (savedChat) {
+        try {
+          const messages = JSON.parse(savedChat);
+          const chatDiv = document.getElementById("chatSection");
+          messages.forEach(msg => {
+            const p = document.createElement("p");
+            p.textContent = (msg.role === "user" ? "👤 " : "🤖 ") + msg.text;
+            p.style.margin = "4px 0";
+            chatDiv.appendChild(p);
+          });
+        } catch (e) {
+          console.error("Failed to parse chatMessages:", e);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
+

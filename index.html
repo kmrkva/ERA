@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experimental Realism AI - Consumer Research Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr;
+            min-height: calc(100vh - 40px);
+        }
+
+        /* Updated header with new branding */
+        .header {
+            background: #1a1a1a;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
+
+        /* Added main content area with flexible layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            min-height: 0;
+        }
+
+        .main-content.split-view {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #eee;
+        }
+
+        .right-panel {
+            display: none;
+            flex-direction: column;
+            background: #f8f9fa;
+        }
+
+        .right-panel.active {
+            display: flex;
+        }
+
+
+        .upload-section {
+            padding: 40px;
+        }
+
+        .upload-area {
+            border: 3px dashed #ddd;
+            border-radius: 12px;
+            padding: 60px 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: #fafafa;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .upload-text {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .upload-subtext {
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .preview-section {
+            padding: 0 40px;
+            display: none;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results-section {
+            padding: 40px;
+            display: none;
+            border-top: 1px solid #eee;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .results-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* Added action buttons for preview and chat */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Updated preview button styles to accommodate two options */
+        .preview-btn, .chat-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s ease;
+        }
+
+        .preview-btn:hover {
+            background: #218838;
+        }
+
+        /* Added styles for fullscreen preview button */
+        .fullscreen-preview-btn {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s ease;
+        }
+
+        .fullscreen-preview-btn:hover {
+            background: #138496;
+        }
+
+        .chat-btn {
+            background: #17a2b8;
+        }
+
+        .chat-btn:hover {
+            background: #138496;
+        }
+
+        /* Added styles for clarification text */
+        .chat-clarification {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+
+        /* Added styles for Use This Design button and status messages */
+        .use-design-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .use-design-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .status-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        /* Added styles for chat loading spinner */
+        .chat-loading {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .chat-loading-spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Added styles for final steps page */
+        .final-steps-page {
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            height: 100%;
+        }
+
+        .steps-panel {
+            padding: 40px;
+            background: #f8f9fa;
+            border-right: 1px solid #eee;
+        }
+
+        .steps-title {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .step-item {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .step-number {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .step-description {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .back-to-editor-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .back-to-editor-btn:hover {
+            background: #5a6268;
+        }
+
+        .response-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .response-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .response-content {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .code-container {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .code-title {
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .copy-btn, .download-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .copy-btn:hover, .download-btn:hover {
+            background: #5a6fd8;
+        }
+
+        .download-btn {
+            background: #28a745;
+        }
+
+        .download-btn:hover {
+            background: #218838;
+        }
+
+        .code-content {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        /* Added preview panel styles */
+        .preview-panel {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .preview-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .close-preview {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .close-preview:hover {
+            background: #c82333;
+        }
+
+        .preview-iframe {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: white;
+        }
+
+        /* Added chat interface styles */
+        .chat-panel {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .chat-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .close-chat {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .close-chat:hover {
+            background: #c82333;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+
+        .chat-message.user {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+        }
+
+        .chat-message.assistant {
+            background: #f1f3f4;
+            color: #333;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 50px;
+        }
+
+        .send-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            white-space: nowrap;
+        }
+
+        .send-btn:hover {
+            background: #5a6fd8;
+        }
+
+        .send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #c33;
+        }
+
+        .success {
+            background: #efe;
+            color: #363;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #363;
+        }
+
+        .reset-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .reset-btn:hover {
+            background: #5a6268;
+        }
+
+        /* Added responsive design */
+        @media (max-width: 1200px) {
+            .main-content.split-view {
+                grid-template-columns: 1fr;
+            }
+            
+            .right-panel.active {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 1000;
+                background: white;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Experimental Realism AI</h1>
+            <p>Consumer Research Tool - Create realistic eCommerce choice webpages for lab experiments</p>
+        </div>
+
+        <!-- Restructured main content with split view capability -->
+        <div class="main-content" id="mainContent">
+            <div class="left-panel">
+                <div class="upload-section">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📷</div>
+                        <div class="upload-text">Drop your screenshot here or click to browse</div>
+                        <div class="upload-subtext">Supports PNG, JPG, GIF (max 10MB)</div>
+                    </div>
+                    <input type="file" id="fileInput" accept="image/*">
+                </div>
+
+                <div class="preview-section" id="previewSection">
+                    <img id="previewImage" class="preview-image" alt="Preview">
+                    <button class="generate-btn" id="generateBtn">Generate HTML with v0.dev</button>
+                </div>
+
+                <div class="loading" id="loading">
+                    <div class="loading-spinner"></div>
+                    <p>Generating HTML with AI... This may take a moment.</p>
+                </div>
+
+                <div class="results-section" id="resultsSection">
+                    <h2 class="results-title">Generated HTML Code</h2>
+                    
+                    <!-- Updated action buttons to include two preview options -->
+                    <div class="action-buttons">
+                        <button class="preview-btn" id="previewBtn">👁️ Preview Webpage</button>
+                        <button class="fullscreen-preview-btn" id="fullscreenPreviewBtn">🔍 Fullscreen Preview</button>
+                        <button class="chat-btn" id="chatBtn">💬 Make Changes</button>
+                    </div>
+
+                    <!-- Added clarification text for Make Changes button -->
+                    <div class="response title">
+                        <em>To preview the full design in a new browser tab, click "Fullscreen Preview".<br><br>To make edits to the design using AI, click "Make Changes" to chat with AI and request changes.</em> 
+                    </div>
+                    
+                    <div class="response-container" id="promptContainer">
+                        <div class="response-title">Prompt Used</div>
+                        <div class="response-content" id="promptContent"></div>
+                    </div>
+
+                    <div class="response-container" id="responseContainer" style="display: none;">
+                        <div class="response-title">AI Response</div>
+                        <div class="response-content" id="responseContent"></div>
+                    </div>
+
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span class="code-title">HTML Output</span>
+                            <div class="code-actions">
+                                <button class="copy-btn" id="copyBtn">Copy Code</button>
+                                <button class="download-btn" id="downloadBtn">Download HTML</button>
+                            </div>
+                        </div>
+                        <div class="code-content" id="codeContent"></div>
+                    </div>
+
+                    <!-- Added Use This Design button and status message area -->
+                    <div class="status-message" id="statusMessage"></div>
+					<p class="response title">
+                        <br><br><br>When you're happy with the design, click "Use This Design" below and we will walk you through next steps & options. If you'd like to edit the design, you can first select "Make Changes" and you can examine a "Fullscreen Preview" after each change.
+                    </p>
+                    <button class="use-design-btn" id="useDesignBtn">Use This Design</button>
+                </div>
+            </div>
+
+            <!-- Added right panel for preview and chat -->
+            <div class="right-panel" id="rightPanel">
+                <!-- Preview Panel -->
+                <div class="preview-panel" id="previewPanelContent" style="display: none;">
+                    <div class="preview-header">
+                        <h3 class="preview-title">Webpage Preview</h3>
+                        <button class="close-preview" id="closePreview">✕ Close</button>
+                    </div>
+                    <iframe class="preview-iframe" id="previewIframe" sandbox="allow-scripts allow-same-origin"></iframe>
+                </div>
+
+                <!-- Chat Panel -->
+                <div class="chat-panel" id="chatPanelContent" style="display: none;">
+                    <div class="chat-header">
+                        <h3 class="chat-title">Make Changes</h3>
+                        <button class="close-chat" id="closeChat">✕ Close</button>
+                    </div>
+                    <div class="chat-messages" id="chatMessages"></div>
+                    <div class="chat-input-container">
+                        <textarea class="chat-input" id="chatInput" placeholder="Describe the changes you'd like to make..."></textarea>
+                        <button class="send-btn" id="sendBtn">Send</button>
+                        <!-- Added loading indicator for chat -->
+                        <div class="chat-loading" id="chatLoading">
+                            <div class="chat-loading-spinner"></div>
+                            <span>AI is making changes...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Added final steps page -->
+        <div class="final-steps-page" id="finalStepsPage">
+            <div class="steps-panel">
+                <h2 class="steps-title">Next Steps & Options</h2>
+                
+                <div class="step-item">
+                    <div class="step-number">Step 1</div>
+                    <div class="step-title">Review Your Design</div>
+                    <div class="step-description">Your experimental webpage is ready. Review the final HTML code on the right.</div>
+                </div>
+
+                <div class="step-item">
+                    <div class="step-number">Step 2</div>
+                    <div class="step-title">Deploy for Testing</div>
+                    <div class="step-description">Upload the HTML file to your web server or testing platform for consumer research experiments.</div>
+                </div>
+
+                <div class="step-item">
+                    <div class="step-number">Step 3</div>
+                    <div class="step-title">Configure Experiment</div>
+                    <div class="step-description">Set up your experimental conditions, participant groups, and data collection methods.</div>
+                </div>
+
+                <div class="step-item">
+                    <div class="step-number">Step 4</div>
+                    <div class="step-title">Run Consumer Tests</div>
+                    <div class="step-description">Launch your consumer choice experiments using the realistic eCommerce webpage.</div>
+                </div>
+
+                <button class="back-to-editor-btn" id="backToEditorBtn">← Back to Editor</button>
+            </div>
+
+            <div class="results-section" style="display: block;">
+                <h2 class="results-title">Final HTML Code</h2>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-title">HTML Output (Final Version)</span>
+                        <div class="code-actions">
+                            <button class="copy-btn" id="finalCopyBtn">Copy Code</button>
+                            <button class="download-btn" id="finalDownloadBtn">Download HTML</button>
+                        </div>
+                    </div>
+                    <div class="code-content" id="finalCodeContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const previewSection = document.getElementById('previewSection');
+        const previewImage = document.getElementById('previewImage');
+        const generateBtn = document.getElementById('generateBtn');
+        const loading = document.getElementById('loading');
+        const resultsSection = document.getElementById('resultsSection');
+        const codeContent = document.getElementById('codeContent');
+        const copyBtn = document.getElementById('copyBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const promptContainer = document.getElementById('promptContainer');
+        const promptContent = document.getElementById('promptContent');
+        const responseContainer = document.getElementById('responseContainer');
+        const responseContent = document.getElementById('responseContent');
+
+        const mainContent = document.getElementById('mainContent');
+        const rightPanel = document.getElementById('rightPanel');
+        const previewBtn = document.getElementById('previewBtn');
+        const chatBtn = document.getElementById('chatBtn');
+        const previewPanelContent = document.getElementById('previewPanelContent');
+        const chatPanelContent = document.getElementById('chatPanelContent');
+        const closePreview = document.getElementById('closePreview');
+        const closeChat = document.getElementById('closeChat');
+        const previewIframe = document.getElementById('previewIframe');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        const fullscreenPreviewBtn = document.getElementById('fullscreenPreviewBtn');
+        const useDesignBtn = document.getElementById('useDesignBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        const chatLoading = document.getElementById('chatLoading');
+        const finalStepsPage = document.getElementById('finalStepsPage');
+        const backToEditorBtn = document.getElementById('backToEditorBtn');
+        const finalCopyBtn = document.getElementById('finalCopyBtn');
+        const finalDownloadBtn = document.getElementById('finalDownloadBtn');
+        const finalCodeContent = document.getElementById('finalCodeContent');
+
+        let selectedFile = null;
+        let cleanHtmlCode = '';
+        let conversationHistory = []; // Added conversation tracking
+        const defaultPrompt = 'Please recreate this UI as a fully functional standalone HTML webpage with JavaScript. All interactive elements should work as they would on the real website - clicking different options should select them, buttons should be clickable, and any user interactions should have appropriate visual feedback and state changes.';
+
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        function handleFileSelect(file) {
+            if (!file.type.startsWith('image/')) {
+                showError('Please select an image file.');
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                showError('File size must be less than 10MB.');
+                return;
+            }
+
+            selectedFile = file;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImage.src = e.target.result;
+                previewSection.style.display = 'block';
+                resultsSection.style.display = 'none';
+                closePanels();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function extractCleanHtml(response) {
+            let cleaned = response.replace(/<Thinking>[\s\S]*?<\/Thinking>/gi, '');
+            
+            const htmlStart = cleaned.search(/<!DOCTYPE\s+html/i);
+            const htmlEnd = cleaned.lastIndexOf('</html>');
+            
+            if (htmlStart === -1) {
+                const htmlTagStart = cleaned.search(/<html[^>]*>/i);
+                if (htmlTagStart !== -1) {
+                    if (htmlEnd !== -1) {
+                        return cleaned.substring(htmlTagStart, htmlEnd + 7).trim();
+                    } else {
+                        return cleaned.substring(htmlTagStart).trim();
+                    }
+                }
+                return response.trim();
+            }
+            
+            let htmlDocument = '';
+            
+            if (htmlEnd !== -1) {
+                htmlDocument = cleaned.substring(htmlStart, htmlEnd + 7);
+            } else {
+                htmlDocument = cleaned.substring(htmlStart);
+            }
+            
+            return htmlDocument.trim();
+        }
+
+        function hasJavaScript(htmlContent) {
+            const scriptTags = (htmlContent.match(/<script[\s\S]*?<\/script>/gi) || []).length;
+            const inlineHandlers = (htmlContent.match(/on\w+\s*=/gi) || []).length;
+            const jsKeywords = (htmlContent.match(/function\s+|addEventListener|querySelector|getElementById/gi) || []).length;
+            
+            console.log('JavaScript detection:', {
+                scriptTags,
+                inlineHandlers,
+                jsKeywords,
+                hasJS: scriptTags > 0 || inlineHandlers > 0 || jsKeywords > 0
+            });
+            
+            return scriptTags > 0 || inlineHandlers > 0 || jsKeywords > 0;
+        }
+
+        generateBtn.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            generateBtn.disabled = true;
+            loading.style.display = 'block';
+            resultsSection.style.display = 'none';
+            closePanels();
+
+            const formData = new FormData();
+            formData.append('screenshot', selectedFile);
+            formData.append('prompt', defaultPrompt);
+            formData.append('include_javascript', 'true');
+            formData.append('make_interactive', 'true');
+            formData.append('format', 'complete_html_with_js');
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    const fullResponse = result.text;
+                    cleanHtmlCode = extractCleanHtml(fullResponse);
+                    
+                    conversationHistory = [
+                        { role: 'user', content: defaultPrompt, hasImage: true },
+                        { role: 'assistant', content: fullResponse }
+                    ];
+                    
+                    console.log('Full API Response:', fullResponse);
+                    console.log('Extracted HTML length:', cleanHtmlCode.length);
+                    console.log('Has JavaScript:', hasJavaScript(cleanHtmlCode));
+                    
+                    promptContent.textContent = defaultPrompt;
+                    codeContent.textContent = cleanHtmlCode;
+                    
+                    const jsStatus = hasJavaScript(cleanHtmlCode) ? 
+                        'JavaScript detected ✓' : 
+                        'No JavaScript found - check backend configuration';
+                    
+                    if (fullResponse !== cleanHtmlCode) {
+                        const responseText = fullResponse.replace(cleanHtmlCode, '').trim();
+                        if (responseText) {
+                            responseContent.textContent = responseText + '\n\nJS Status: ' + jsStatus;
+                            responseContainer.style.display = 'block';
+                        }
+                    } else {
+                        responseContent.textContent = 'Full response was clean HTML. JS Status: ' + jsStatus;
+                        responseContainer.style.display = 'block';
+                    }
+                    
+                    resultsSection.style.display = 'block';
+                    showSuccess('HTML generated successfully!');
+                } else {
+                    showError(result.error || 'Failed to generate HTML');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Network error. Please try again.');
+            } finally {
+                loading.style.display = 'none';
+                generateBtn.disabled = false;
+            }
+        });
+
+        previewBtn.addEventListener('click', () => {
+            if (!cleanHtmlCode) {
+                showError('No HTML code to preview');
+                return;
+            }
+            
+            showPreview();
+        });
+
+        fullscreenPreviewBtn.addEventListener('click', () => {
+            if (!cleanHtmlCode) {
+                showError('No HTML code to preview');
+                return;
+            }
+            
+            // Create blob URL for the HTML content
+            const blob = new Blob([cleanHtmlCode], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            
+            // Open in new window/tab
+            const newWindow = window.open(url, '_blank');
+            if (!newWindow) {
+                showError('Please allow popups to view fullscreen preview');
+            }
+            
+            // Clean up the blob URL after a delay
+            setTimeout(() => URL.revokeObjectURL(url), 5000);
+        });
+
+        chatBtn.addEventListener('click', () => {
+            if (!cleanHtmlCode) {
+                showError('No HTML code to modify');
+                return;
+            }
+            
+            showChat();
+        });
+
+		document.getElementById('useDesignBtn').addEventListener('click', () => {
+		  if (cleanHtmlCode) {
+			// Save the generated HTML code
+			localStorage.setItem("generatedCode", cleanHtmlCode);
+
+			// Save the original prompt text
+			const prompt = document.getElementById("promptContent")?.textContent || "";
+			localStorage.setItem("generatedPrompt", prompt);
+
+			// Save all chat messages (user + assistant)
+			const messages = [];
+			document.querySelectorAll("#chatMessages .chat-message").forEach(msg => {
+			  messages.push({
+				role: msg.classList.contains("user") ? "user" : "assistant",
+				text: msg.textContent
+			  });
+			});
+			localStorage.setItem("chatMessages", JSON.stringify(messages));
+		  }
+
+		  // Redirect to nextsteps.html
+		  window.location.href = "nextsteps.html";
+		});
+
+
+
+        backToEditorBtn.addEventListener('click', () => {
+            finalStepsPage.style.display = 'none';
+            document.querySelector('.container').style.display = 'block';
+        });
+
+        function showPreview() {
+            mainContent.classList.add('split-view');
+            rightPanel.classList.add('active');
+            previewPanelContent.style.display = 'flex';
+            chatPanelContent.style.display = 'none';
+            
+            // Create blob URL for the HTML content
+            const blob = new Blob([cleanHtmlCode], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            previewIframe.src = url;
+            
+            // Clean up the blob URL after a delay
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        function showChat() {
+            mainContent.classList.add('split-view');
+            rightPanel.classList.add('active');
+            chatPanelContent.style.display = 'flex';
+            previewPanelContent.style.display = 'none';
+            
+            if (chatMessages.children.length === 0) {
+                addChatMessage('assistant', 'Would you like to make changes to the resulting webpage? If so, specify your changes in the chat here and we will generate a revised version of the webpage code (or you can download the .html and edit it directly).');
+            }
+        }
+
+        function showFinalSteps() {
+            document.querySelector('.container').style.display = 'none';
+            finalStepsPage.style.display = 'grid';
+            finalCodeContent.textContent = cleanHtmlCode;
+        }
+
+        function closePanels() {
+            mainContent.classList.remove('split-view');
+            rightPanel.classList.remove('active');
+            previewPanelContent.style.display = 'none';
+            chatPanelContent.style.display = 'none';
+        }
+
+        closePreview.addEventListener('click', closePanels);
+        closeChat.addEventListener('click', closePanels);
+
+        function addChatMessage(role, content) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${role}`;
+            messageDiv.textContent = content;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        sendBtn.addEventListener('click', sendChatMessage);
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendChatMessage();
+            }
+        });
+
+        async function sendChatMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            addChatMessage('user', message);
+            chatInput.value = '';
+            sendBtn.disabled = true;
+
+            chatLoading.style.display = 'flex';
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        conversationHistory: conversationHistory,
+                        currentHtml: cleanHtmlCode
+                    })
+                });
+
+                const result = await response.json();
+
+                chatLoading.style.display = 'none';
+
+                if (result.success) {
+                    const newHtmlCode = extractCleanHtml(result.text);
+                    
+                    // Update conversation history
+                    conversationHistory.push({ role: 'user', content: message });
+                    conversationHistory.push({ role: 'assistant', content: result.text });
+                    
+                    // Update the HTML code
+                    cleanHtmlCode = newHtmlCode;
+                    codeContent.textContent = cleanHtmlCode;
+                    
+                    // Update preview if it's open
+                    if (previewPanelContent.style.display === 'flex') {
+                        const blob = new Blob([cleanHtmlCode], { type: 'text/html' });
+                        const url = URL.createObjectURL(blob);
+                        previewIframe.src = url;
+                        setTimeout(() => URL.revokeObjectURL(url), 1000);
+                    }
+                    
+                    const changesDescription = result.changesDescription || 'Code has been updated based on your request.';
+                    addChatMessage('assistant', `✅ **Revised webpage code generated!**\n\n**Changes made:** ${changesDescription}\n\nYou can see the updated code in the code section and test it in the preview. The revised HTML is ready for download.`);
+                    
+                    statusMessage.textContent = 'Revised HTML generated successfully!';
+                    statusMessage.className = 'status-message success';
+                    statusMessage.style.background = '#efe';
+                    statusMessage.style.color = '#363';
+                    statusMessage.style.borderLeft = '4px solid #363';
+                } else {
+                    addChatMessage('assistant', 'Sorry, I encountered an error while generating the revised webpage. Please try again.');
+                    showError(result.error || 'Failed to generate revised HTML');
+                }
+            } catch (error) {
+                console.error('Chat error:', error);
+                chatLoading.style.display = 'none';
+                addChatMessage('assistant', 'Sorry, there was a network error. Please try again.');
+                showError('Network error. Please try again.');
+            } finally {
+                sendBtn.disabled = false;
+            }
+        }
+
+        copyBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(cleanHtmlCode);
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyBtn.textContent = 'Copy Code';
+                }, 2000);
+            } catch (error) {
+                console.error('Failed to copy:', error);
+                showError('Failed to copy to clipboard');
+            }
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            if (!cleanHtmlCode) {
+                showError('No HTML code to download');
+                return;
+            }
+
+            const blob = new Blob([cleanHtmlCode], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'experimental-realism-webpage.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            downloadBtn.textContent = 'Downloaded!';
+            setTimeout(() => {
+                downloadBtn.textContent = 'Download HTML';
+            }, 2000);
+        });
+
+        finalCopyBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(cleanHtmlCode);
+                finalCopyBtn.textContent = 'Copied!';
+                setTimeout(() => {
+                    finalCopyBtn.textContent = 'Copy Code';
+                }, 2000);
+            } catch (error) {
+                console.error('Failed to copy:', error);
+                showError('Failed to copy to clipboard');
+            }
+        });
+
+        finalDownloadBtn.addEventListener('click', () => {
+            if (!cleanHtmlCode) {
+                showError('No HTML code to download');
+                return;
+            }
+
+            const blob = new Blob([cleanHtmlCode], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'experimental-realism-webpage.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            finalDownloadBtn.textContent = 'Downloaded!';
+            setTimeout(() => {
+                finalDownloadBtn.textContent = 'Download HTML';
+            }, 2000);
+        });
+
+        resetBtn.addEventListener('click', () => {
+            selectedFile = null;
+            cleanHtmlCode = '';
+            conversationHistory = []; // Reset conversation
+            fileInput.value = '';
+            previewSection.style.display = 'none';
+            resultsSection.style.display = 'none';
+            responseContainer.style.display = 'none';
+            promptContainer.style.display = 'none';
+            loading.style.display = 'none';
+            chatMessages.innerHTML = '';
+            statusMessage.textContent = '';
+            finalStepsPage.style.display = 'none';
+            document.querySelector('.container').style.display = 'block';
+            closePanels();
+            clearMessages();
+        });
+
+        function showError(message) {
+            clearMessages();
+            const error = document.createElement('div');
+            error.className = 'error';
+            error.textContent = message;
+            document.querySelector('.upload-section').appendChild(error);
+        }
+
+        function showSuccess(message) {
+            clearMessages();
+            statusMessage.textContent = message;
+            statusMessage.className = 'status-message success';
+            statusMessage.style.background = '#efe';
+            statusMessage.style.color = '#363';
+            statusMessage.style.borderLeft = '4px solid #363';
+        }
+
+        function clearMessages() {
+            document.querySelectorAll('.error, .success').forEach(el => el.remove());
+        }
+    </script>
+</body>
+</html>
