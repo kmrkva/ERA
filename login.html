@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; }
+    input, button { font-size: 1rem; padding: 0.5rem; margin: 0.25rem 0; }
+  </style>
+</head>
+<body>
+  <h1>Login</h1>
+  <p>Enter your email to receive a magic link:</p>
+
+  <form id="login-form">
+    <input type="email" id="email" placeholder="you@uni.edu" required />
+    <button type="submit">Send Magic Link</button>
+  </form>
+
+  <p id="message"></p>
+
+  <!-- Supabase v1 UMD bundle -->
+<!-- Supabase v1 UMD bundle via unpkg -->
+<script src="https://unpkg.com/@supabase/supabase-js@1.35.7/dist/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = "https://fbssaxodchdkstnaivvj.supabase.co";
+  const SUPABASE_ANON_KEY = "YOUR_ANON_KEY_HERE";
+
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const form = document.getElementById("login-form");
+  const message = document.getElementById("message");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("email").value;
+    message.textContent = "Sending magic link...";
+
+    try {
+      const { error } = await supabaseClient.auth.api.signInWithEmail(email, {
+        redirectTo: window.location.origin + "/index.html"
+      });
+
+      if (error) {
+        console.error("Supabase error:", error);
+        message.textContent = "Error sending magic link: " + error.message;
+      } else {
+        console.log("Magic link sent successfully");
+        message.textContent = "Magic link sent! Check your email.";
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      message.textContent = "Unexpected error occurred.";
+    }
+  });
+</script>
+
+</body>
+</html>

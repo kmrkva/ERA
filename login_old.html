@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+</head>
+<body>
+  <h1>Login</h1>
+  <p>Enter your email to receive a magic link:</p>
+
+  <form id="login-form">
+    <input type="email" id="email" placeholder="you@example.com" required />
+    <button type="submit">Send Magic Link</button>
+  </form>
+
+  <p id="message"></p>
+
+  <!-- Supabase client: full UMD bundle -->
+<!-- Supabase JS v2 UMD bundle -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.28.0/dist/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1.35.7/dist/supabase.min.js"></script>
+<script>
+  const SUPABASE_URL = "https://fbssaxodchdkstnaivvj.supabase.co";
+  const SUPABASE_ANON_KEY = "YOUR_ANON_KEY_HERE";
+
+  // v1 global object
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const form = document.getElementById("login-form");
+  const message = document.getElementById("message");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("email").value;
+    console.log("Submitting email:", email);
+
+    const { error } = await supabaseClient.auth.api.signInWithEmail(email, {
+      redirectTo: window.location.origin + "/index.html"
+    });
+
+    if (error) {
+      console.error("Supabase error:", error);
+      message.textContent = "Error: " + error.message;
+    } else {
+      console.log("Magic link sent successfully");
+      message.textContent = "Magic link sent! Check your email.";
+    }
+  });
+</script>
+
+
+</body>
+</html>
